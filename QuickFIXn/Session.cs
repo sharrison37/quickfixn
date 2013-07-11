@@ -200,6 +200,11 @@ namespace QuickFix
         /// </summary>
         public bool RequiresOrigSendingTime { get; set; }
 
+        /// <summary>        
+        /// If true, passes all incoming messages on to Application even if they're dupes
+        /// </summary>
+        public bool PassAllMessages { get; set; }
+
         #endregion
 
         public Session(
@@ -867,10 +872,27 @@ namespace QuickFix
         {
             int msgSeqNum = 0;
             string msgType = "";
+            Exception appEx = null;
 
             try
             {
                 msgType = msg.Header.GetField(Fields.Tags.MsgType);
+
+                if (this.PassAllMessages)
+                {
+                    try
+                    {
+                        if (Message.IsAdminMsgType(msgType))
+                            this.Application.FromAdmin(msg, this.SessionID);
+                        else
+                            this.Application.FromApp(msg, this.SessionID);
+                    }
+                    catch (Exception ex)
+                    {
+                        appEx = ex;
+                    }
+                }
+
                 string senderCompID = msg.Header.GetField(Fields.Tags.SenderCompID);
                 string targetCompID = msg.Header.GetField(Fields.Tags.TargetCompID);
 
@@ -930,10 +952,20 @@ namespace QuickFix
             state_.LastReceivedTimeDT = DateTime.UtcNow;
             state_.TestRequestCounter = 0;
 
-            if (Message.IsAdminMsgType(msgType))
-                this.Application.FromAdmin(msg, this.SessionID);
+            if (PassAllMessages)
+            {
+                if (appEx != null)
+                {
+                    throw appEx;
+                }
+            }
             else
-                this.Application.FromApp(msg, this.SessionID);
+            {
+                if (Message.IsAdminMsgType(msgType))
+                    this.Application.FromAdmin(msg, this.SessionID);
+                else
+                    this.Application.FromApp(msg, this.SessionID);
+            }
 
             return true;
         }

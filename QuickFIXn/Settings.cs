@@ -14,6 +14,11 @@ namespace QuickFix
             while ((line = conf.ReadLine()) != null)
             {
                 line = line.Trim();
+                // TODO: make this more generic
+                if (line.Contains("$AppPath"))
+                {
+                    line = line.Replace("$AppPath", System.AppDomain.CurrentDomain.BaseDirectory);
+                }
                 if (IsComment(line))
                 {
                     continue;
