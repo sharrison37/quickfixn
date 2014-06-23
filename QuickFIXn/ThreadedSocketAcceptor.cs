@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System;
 
@@ -117,19 +118,19 @@ namespace QuickFix
             IPEndPoint socketEndPoint;
             if (dict.Has(SessionSettings.SOCKET_ACCEPT_HOST))
             {
-                string host = dict.GetString(SessionSettings.SOCKET_ACCEPT_HOST);
+                string host = dict.GetString(SessionSettings.SOCKET_ACCEPT_HOST);                
                 IPAddress[] addrs = Dns.GetHostAddresses(host);
                 socketEndPoint = new IPEndPoint(addrs[0], port);
+                // Set hostname (if it is not already configured)
+                socketSettings.ServerCommonName = socketSettings.ServerCommonName ?? host;
             }
             else
             {
                 socketEndPoint = new IPEndPoint(IPAddress.Any, port);
             }
 
-            if (dict.Has(SessionSettings.SOCKET_NODELAY))
-            {
-                socketSettings.SocketNodelay = dict.GetBool(SessionSettings.SOCKET_NODELAY);
-            }
+            socketSettings.Configure(dict);
+            
 
             AcceptorSocketDescriptor descriptor;
             if (!socketDescriptorForAddress_.TryGetValue(socketEndPoint, out descriptor))
@@ -181,7 +182,7 @@ namespace QuickFix
                 }
             }
 
-            if (force && IsLoggedOn())
+            if (force && IsLoggedOn)
             {
                 foreach (Session session in sessions_.Values)
                 {
@@ -266,12 +267,15 @@ namespace QuickFix
         }
 
         /// <summary>
-        /// TODO: not yet implemented
+        /// Check whether any sessions are logged on
         /// </summary>
-        /// <returns></returns>
-        public bool IsLoggedOn()
+        /// <returns>true if any session is logged on, else false</returns>
+        public bool IsLoggedOn
         {
-            throw new System.NotImplementedException();
+            get
+            {
+                return sessions_.Values.Any(session => session.IsLoggedOn);
+            }
         }
 
         /// <summary>

@@ -10,25 +10,15 @@ change should affect the version level (e.g. patch/minor/major).
 
 (For Semantic Versioning number rules, see http://semver.org)
 
-Don't forget to note the contributor's name or git handle!
+Don't forget to note the contributor's name or git handle
+and add their name to web/views/about/credits.md
 
 
 Changes since the last version:
 -------------------------------
 * (major/minor/patch) desc of fixed issue (contributor)
 
-* (patch) pr #181 - add null checks to SessionID constructor (roji)
-* (minor) issue #48 - IInitiator.Stop() must release resources (jungers42/gbirchmeier)
-* (patch) issue #160 - floats without leading zeros (e.g. ".23") now parsed properly (gbirchmeier)
-* (patch) issue #187 - make IInitiator implement IDisposable (gbirchmeier)
-* (minor) pr #178 - can now load DD from a stream instead of a file (robsonj)
-* (patch) issue #183 - Session.Reset should only logout if already logged in (ligu)
-* (patch) issue #40 - remove redundant/misplaced body length check in parser (gbirchmeier)
-* (minor) pr #180 - new CompositeLogFactory (roji)
-* (patch) issue #179 - bug in parsing groups when message factory is null (klmcwhirter/TomasVetrovsky/gbirchmeier)
-* (minor) issue #102 - allow SequenceReset/PossDup messages to omit tag 122 (thomasfleming/gbirchmeier)
-* (patch) issue #153 - Chunked resends are now sent "on-demand" instead of all-at-once (roji)
-* (patch) issue #173 - bug in Message.IsAdmin/IsApp (TomasVetrovsky/gbirchmeier)
-* (patch) issue #166 - FIX44 spec missing PutOrCall and UnderlyingPutOrCall (gbirchmeier)
-* (patch) corrections/updates to FIX44 spec based on diff with QF/j version (gbirchmeier)
+* (minor) #247 - support for CheckLatency/MaxLatency config settings (ruaanviljoen)
+* (minor) #256 - bug in 247, defaults override config (akamyshanov)
+* (minor) #258 - threadsafe SessionState.Get/Set to fix garbled message issue (jacsuper)
 
